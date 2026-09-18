@@ -105,7 +105,7 @@ export function ImageUploadField({
                 setLocalPreview(null);
                 onChange(e.target.value);
               }}
-              placeholder="https://… ou /uploads/…"
+              placeholder="https://… (Blob/TCG) ou /uploads/…"
               className="field"
             />
           )}

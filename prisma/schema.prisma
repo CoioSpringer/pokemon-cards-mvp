@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Condition {
+  NM
+  LP
+  MP
+  HP
+}
+
+enum ListingMode {
+  HAVE
+  WANT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  portfolioCards PortfolioCard[]
+  listings       Listing[]
+  sentMessages   Message[]       @relation("SentMessages")
+  conversationsAsBuyer  Conversation[] @relation("BuyerConversations")
+  conversationsAsSeller Conversation[] @relation("SellerConversations")
+}
+
+model PortfolioCard {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  set       String
+  condition Condition
+  priceBRL  Float
+  notes     String    @default("")
+  photoUrl  String    @default("")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listings Listing[]
+}
+
+model Listing {
+  id              String      @id @default(cuid())
+  userId          String
+  portfolioCardId String?
+  mode            ListingMode
+  name            String
+  set             String
+  condition       Condition
+  priceBRL        Float
+  notes           String      @default("")
+  photoUrl        String      @default("")
+  active          Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioCard PortfolioCard? @relation(fields: [portfolioCardId], references: [id], onDelete: SetNull)
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  listingId String
+  buyerId   String
+  sellerId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer    User      @relation("BuyerConversations", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User      @relation("SellerConversations", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([listingId, buyerId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+}

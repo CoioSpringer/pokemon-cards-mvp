@@ -51,5 +51,6 @@ prisma/dev.db-journal
 *.db
 *.db-journal
 
-# uploads
-/public/uploads
+# local uploaded images (keep folder via .gitkeep)
+/public/uploads/*
+!/public/uploads/.gitkeep

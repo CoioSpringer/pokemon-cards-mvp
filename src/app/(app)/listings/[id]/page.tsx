@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CONDITION_LABELS, MODE_LABELS, formatBRL, placeholderCardImage } from "@/lib/format";
 import { StartChatButton } from "@/components/StartChatButton";
+import { OwnerListingActions } from "@/components/OwnerListingActions";
+import { ConditionBadge } from "@/components/ConditionBadge";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -16,10 +18,12 @@ export default async function ListingDetailPage({ params }: Ctx) {
     where: { id },
     include: { user: { select: { id: true, name: true } } },
   });
-  if (!listing || !listing.active) notFound();
+  if (!listing) notFound();
+
+  const isOwner = listing.userId === user.id;
+  if (!listing.active && !isOwner) notFound();
 
   const img = listing.photoUrl || placeholderCardImage(listing.name);
-  const isOwner = listing.userId === user.id;
 
   return (
     <div className="container-page">
@@ -28,20 +32,28 @@ export default async function ListingDetailPage({ params }: Ctx) {
       </Link>
 
       <div className="mt-4 grid gap-6 md:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg shadow-black/20">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={img} alt={listing.name} className="aspect-[3/4] w-full object-cover" />
         </div>
 
         <div className="space-y-4">
           <div>
-            <span
-              className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase ${
-                listing.mode === "HAVE" ? "bg-emerald-500 text-white" : "bg-sky-500 text-white"
-              }`}
-            >
-              {MODE_LABELS[listing.mode]}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase ${
+                  listing.mode === "HAVE" ? "bg-emerald-500 text-white" : "bg-sky-500 text-white"
+                }`}
+              >
+                {MODE_LABELS[listing.mode]}
+              </span>
+              <ConditionBadge condition={listing.condition} />
+              {!listing.active && (
+                <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-400">
+                  Inativo
+                </span>
+              )}
+            </div>
             <h1 className="mt-3 text-3xl font-bold text-white">{listing.name}</h1>
             <p className="text-slate-400">{listing.set}</p>
           </div>
@@ -69,13 +81,7 @@ export default async function ListingDetailPage({ params }: Ctx) {
           )}
 
           {isOwner ? (
-            <p className="rounded-xl bg-slate-900 p-3 text-sm text-slate-400 ring-1 ring-slate-800">
-              Este é o seu anúncio. Aguarde mensagens de interessados em{" "}
-              <Link href="/chat" className="text-yellow-400 hover:underline">
-                Chat
-              </Link>
-              .
-            </p>
+            <OwnerListingActions listingId={listing.id} active={listing.active} />
           ) : (
             <StartChatButton listingId={listing.id} />
           )}

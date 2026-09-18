@@ -12,6 +12,7 @@ Colecionadores cadastram um **portfólio** de cartas (foto, nome, set, condiçã
 - Tailwind CSS
 - Prisma + SQLite
 - Auth por e-mail/senha (JWT em cookie httpOnly)
+- Upload local de fotos em `public/uploads`
 
 ## Pré-requisitos
 
@@ -58,18 +59,26 @@ Abra [http://localhost:3000](http://localhost:3000).
 | `maria@pokemon.local` | `demo1234` |
 | `joao@pokemon.local` | `demo1234` |
 
+## Uploads de foto
+
+- Formulários de **portfólio** e **anúncio** aceitam arquivo de imagem (JPG, PNG, WebP, GIF · máx. 5 MB).
+- Arquivos ficam em `public/uploads/` e a URL pública (`/uploads/...`) é salva no banco.
+- Campo de **URL** continua disponível como fallback (útil para imagens remotas do seed).
+- Binários em `public/uploads/` entram no `.gitignore`; o diretório é mantido via `.gitkeep`.
+- Em cada máquina local, as fotos enviadas existem só naquele disco (não vão para o Git).
+
 ## O que funciona no MVP
 
 1. Cadastro / login / logout
-2. CRUD de portfólio (foto via URL ou placeholder)
-3. Criar anúncios Have/Want (opcionalmente a partir do portfólio)
+2. CRUD de portfólio (upload de foto ou URL)
+3. Criar, editar, desativar e reativar anúncios Have/Want
 4. Feed com filtros: modo, nome, set, faixa de preço
 5. Detalhe do anúncio
 6. Chat 1:1 ligado ao anúncio (polling leve)
 
 ## Fora de escopo
 
-Pagamentos, frete, leilões, grading, integração WhatsApp, apps nativos.
+Pagamentos, frete, leilões, grading, integração WhatsApp, apps nativos, Postgres/Vercel (ainda).
 
 ## Licença
 

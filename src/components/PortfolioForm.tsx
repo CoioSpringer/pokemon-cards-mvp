@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ImageUploadField } from "./ImageUploadField";
 
 export type PortfolioValues = {
   id?: string;
@@ -23,6 +24,8 @@ export function PortfolioForm({
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl || "");
+  const [name, setName] = useState(initial?.name || "");
   const editing = Boolean(initial?.id);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -36,7 +39,7 @@ export function PortfolioForm({
       condition: String(form.get("condition") || "NM"),
       priceBRL: Number(form.get("priceBRL") || 0),
       notes: String(form.get("notes") || ""),
-      photoUrl: String(form.get("photoUrl") || ""),
+      photoUrl,
     };
 
     const res = await fetch(editing ? `/api/portfolio/${initial!.id}` : "/api/portfolio", {
@@ -44,28 +47,39 @@ export function PortfolioForm({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
-      setError(data.error || "Erro ao salvar");
+      setError(data.error || "Não foi possível salvar a carta. Verifique os campos.");
       return;
     }
     onDone?.();
     router.refresh();
-    if (!editing) e.currentTarget.reset();
+    if (!editing) {
+      e.currentTarget.reset();
+      setPhotoUrl("");
+      setName("");
+    }
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-slate-800 bg-slate-900 p-4">
       <h2 className="font-semibold text-white">{editing ? "Editar carta" : "Adicionar carta"}</h2>
-      <input name="name" required defaultValue={initial?.name} placeholder="Nome da carta" className="field" />
+      <input
+        name="name"
+        required
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Nome da carta"
+        className="field"
+      />
       <input name="set" required defaultValue={initial?.set} placeholder="Set / expansão" className="field" />
       <div className="grid grid-cols-2 gap-3">
         <select name="condition" defaultValue={initial?.condition || "NM"} className="field">
-          <option value="NM">NM</option>
-          <option value="LP">LP</option>
-          <option value="MP">MP</option>
-          <option value="HP">HP</option>
+          <option value="NM">NM — Near Mint</option>
+          <option value="LP">LP — Little Played</option>
+          <option value="MP">MP — Moderately Played</option>
+          <option value="HP">HP — Heavily Played</option>
         </select>
         <input
           name="priceBRL"
@@ -78,23 +92,33 @@ export function PortfolioForm({
           className="field"
         />
       </div>
-      <input
-        name="photoUrl"
-        defaultValue={initial?.photoUrl}
-        placeholder="URL da foto (opcional)"
-        className="field"
-      />
+      <ImageUploadField value={photoUrl} onChange={setPhotoUrl} previewName={name || "carta"} />
       <textarea
         name="notes"
         defaultValue={initial?.notes}
-        placeholder="Notas"
+        placeholder="Notas (opcional)"
         rows={2}
         className="field"
       />
-      {error && <p className="text-sm text-red-300">{error}</p>}
-      <button type="submit" disabled={loading} className="btn-primary w-full">
-        {loading ? "Salvando..." : editing ? "Atualizar" : "Adicionar"}
-      </button>
+      {error && (
+        <p className="rounded-lg bg-red-950/60 px-3 py-2 text-sm text-red-300" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="flex gap-2">
+        {editing && onDone && (
+          <button
+            type="button"
+            onClick={onDone}
+            className="w-full rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+          >
+            Cancelar
+          </button>
+        )}
+        <button type="submit" disabled={loading} className="btn-primary w-full">
+          {loading ? "Salvando…" : editing ? "Atualizar" : "Adicionar"}
+        </button>
+      </div>
     </form>
   );
 }

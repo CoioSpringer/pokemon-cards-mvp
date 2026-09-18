@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ListingCard } from "@/components/ListingCard";
 import { FeedFilters } from "@/components/FeedFilters";
+import { EmptyState } from "@/components/EmptyState";
 import { ListingMode, Prisma } from "@prisma/client";
 import Link from "next/link";
 
@@ -19,6 +20,7 @@ export default async function FeedPage({ searchParams }: { searchParams: SearchP
   const set = typeof sp.set === "string" ? sp.set.trim() : "";
   const minPrice = typeof sp.minPrice === "string" ? sp.minPrice : "";
   const maxPrice = typeof sp.maxPrice === "string" ? sp.maxPrice : "";
+  const hasFilters = Boolean(mode || q || set || minPrice || maxPrice);
 
   const where: Prisma.ListingWhereInput = { active: true };
   if (mode === "HAVE" || mode === "WANT") where.mode = mode as ListingMode;
@@ -51,7 +53,10 @@ export default async function FeedPage({ searchParams }: { searchParams: SearchP
           <p className="text-sm text-slate-400">Explore anúncios Tenho e Quero</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/meus-anuncios" className="rounded-xl border border-slate-700 px-3 py-2 text-sm hover:bg-slate-900">
+          <Link
+            href="/meus-anuncios"
+            className="rounded-xl border border-slate-700 px-3 py-2 text-sm hover:bg-slate-900"
+          >
             Meus anúncios
           </Link>
           <Link href="/listings/nova" className="btn-primary">
@@ -60,32 +65,47 @@ export default async function FeedPage({ searchParams }: { searchParams: SearchP
         </div>
       </div>
 
-      <Suspense fallback={<div className="text-sm text-slate-400">Carregando filtros...</div>}>
+      <Suspense
+        fallback={
+          <div className="animate-pulse rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
+            Carregando filtros…
+          </div>
+        }
+      >
         <FeedFilters />
       </Suspense>
 
-      <p className="text-xs text-slate-500">{listings.length} anúncio(s)</p>
+      <p className="text-xs text-slate-500">
+        {listings.length} anúncio{listings.length === 1 ? "" : "s"}
+      </p>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-        {listings.map((l) => (
-          <ListingCard
-            key={l.id}
-            id={l.id}
-            name={l.name}
-            set={l.set}
-            mode={l.mode}
-            condition={l.condition}
-            priceBRL={l.priceBRL}
-            photoUrl={l.photoUrl}
-            userName={l.user.name}
-          />
-        ))}
-      </div>
-
-      {listings.length === 0 && (
-        <p className="rounded-xl border border-dashed border-slate-700 p-8 text-center text-slate-400">
-          Nenhum anúncio encontrado com esses filtros.
-        </p>
+      {listings.length === 0 ? (
+        <EmptyState
+          title={hasFilters ? "Nenhum anúncio com esses filtros" : "Feed ainda vazio"}
+          description={
+            hasFilters
+              ? "Tente limpar os filtros ou buscar por outro set / nome."
+              : "Seja o primeiro a publicar um Tenho ou Quero."
+          }
+          actionHref={hasFilters ? "/feed" : "/listings/nova"}
+          actionLabel={hasFilters ? "Limpar filtros" : "Publicar anúncio"}
+        />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {listings.map((l) => (
+            <ListingCard
+              key={l.id}
+              id={l.id}
+              name={l.name}
+              set={l.set}
+              mode={l.mode}
+              condition={l.condition}
+              priceBRL={l.priceBRL}
+              photoUrl={l.photoUrl}
+              userName={l.user.name}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

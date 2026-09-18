@@ -1,14 +1,16 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 
 export function FeedFilters() {
   const router = useRouter();
   const params = useSearchParams();
+  const [loading, setLoading] = useState(false);
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
     const form = new FormData(e.currentTarget);
     const next = new URLSearchParams();
     const mode = String(form.get("mode") || "");
@@ -22,6 +24,13 @@ export function FeedFilters() {
     if (minPrice) next.set("minPrice", minPrice);
     if (maxPrice) next.set("maxPrice", maxPrice);
     router.push(`/feed?${next.toString()}`);
+    setTimeout(() => setLoading(false), 400);
+  }
+
+  function clear() {
+    setLoading(true);
+    router.push("/feed");
+    setTimeout(() => setLoading(false), 400);
   }
 
   return (
@@ -32,16 +41,51 @@ export function FeedFilters() {
           <option value="HAVE">Só Tenho</option>
           <option value="WANT">Só Quero</option>
         </select>
-        <input name="q" defaultValue={params.get("q") || ""} placeholder="Buscar nome..." className="field" />
-        <input name="set" defaultValue={params.get("set") || ""} placeholder="Filtrar set..." className="field" />
+        <input
+          name="q"
+          defaultValue={params.get("q") || ""}
+          placeholder="Buscar nome…"
+          className="field"
+        />
+        <input
+          name="set"
+          defaultValue={params.get("set") || ""}
+          placeholder="Filtrar set…"
+          className="field"
+        />
         <div className="grid grid-cols-2 gap-2">
-          <input name="minPrice" type="number" min="0" step="1" defaultValue={params.get("minPrice") || ""} placeholder="Preço min" className="field" />
-          <input name="maxPrice" type="number" min="0" step="1" defaultValue={params.get("maxPrice") || ""} placeholder="Preço max" className="field" />
+          <input
+            name="minPrice"
+            type="number"
+            min="0"
+            step="1"
+            defaultValue={params.get("minPrice") || ""}
+            placeholder="Preço min"
+            className="field"
+          />
+          <input
+            name="maxPrice"
+            type="number"
+            min="0"
+            step="1"
+            defaultValue={params.get("maxPrice") || ""}
+            placeholder="Preço max"
+            className="field"
+          />
         </div>
       </div>
-      <button type="submit" className="btn-primary w-full sm:w-auto">
-        Filtrar
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button type="submit" disabled={loading} className="btn-primary">
+          {loading ? "Filtrando…" : "Filtrar"}
+        </button>
+        <button
+          type="button"
+          onClick={clear}
+          className="rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+        >
+          Limpar
+        </button>
+      </div>
     </form>
   );
 }

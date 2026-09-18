@@ -12,14 +12,18 @@ export async function GET(req: Request) {
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   const mine = searchParams.get("mine") === "1";
+  const includeInactive = searchParams.get("includeInactive") === "1";
 
   const user = await getCurrentUser();
 
-  const where: Prisma.ListingWhereInput = { active: true };
+  const where: Prisma.ListingWhereInput = {};
 
   if (mine) {
     if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     where.userId = user.id;
+    if (!includeInactive) where.active = true;
+  } else {
+    where.active = true;
   }
 
   if (mode === "HAVE" || mode === "WANT") {

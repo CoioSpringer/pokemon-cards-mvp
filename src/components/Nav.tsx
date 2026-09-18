@@ -7,7 +7,7 @@ export async function Nav() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
         <Link href={user ? "/feed" : "/"} className="flex items-center gap-2 font-bold text-yellow-400">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-sm text-white">
             ポ
@@ -16,17 +16,29 @@ export async function Nav() {
         </Link>
 
         {user ? (
-          <nav className="flex items-center gap-1 text-xs sm:gap-3 sm:text-sm">
-            <Link className="rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800" href="/feed">
+          <nav className="flex max-w-[70%] items-center gap-0.5 overflow-x-auto text-[11px] sm:max-w-none sm:gap-2 sm:text-sm">
+            <Link className="whitespace-nowrap rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800" href="/feed">
               Feed
             </Link>
-            <Link className="rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800" href="/portfolio">
+            <Link
+              className="whitespace-nowrap rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800"
+              href="/portfolio"
+            >
               Portfólio
             </Link>
-            <Link className="rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800" href="/listings/nova">
+            <Link
+              className="whitespace-nowrap rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800"
+              href="/meus-anuncios"
+            >
+              Anúncios
+            </Link>
+            <Link
+              className="whitespace-nowrap rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800"
+              href="/listings/nova"
+            >
               Anunciar
             </Link>
-            <Link className="rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800" href="/chat">
+            <Link className="whitespace-nowrap rounded-lg px-2 py-1 text-slate-200 hover:bg-slate-800" href="/chat">
               Chat
             </Link>
             <span className="hidden text-slate-400 sm:inline">{user.name.split(" ")[0]}</span>

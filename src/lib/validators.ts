@@ -11,25 +11,50 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Informe a senha"),
 });
 
+const photoUrlField = z
+  .string()
+  .max(1000)
+  .optional()
+  .default("")
+  .transform((v) => (v ?? "").trim());
+
 export const portfolioSchema = z.object({
   name: z.string().min(1, "Nome obrigatório").max(120),
   set: z.string().min(1, "Set obrigatório").max(120),
   condition: z.enum(["NM", "LP", "MP", "HP"]),
   priceBRL: z.coerce.number().min(0, "Preço inválido"),
   notes: z.string().max(1000).optional().default(""),
-  photoUrl: z.string().max(500).optional().default(""),
+  photoUrl: photoUrlField,
 });
 
 export const listingSchema = z.object({
   mode: z.enum(["HAVE", "WANT"]),
-  name: z.string().min(1).max(120),
-  set: z.string().min(1).max(120),
+  name: z.string().min(1, "Nome obrigatório").max(120),
+  set: z.string().min(1, "Set obrigatório").max(120),
   condition: z.enum(["NM", "LP", "MP", "HP"]),
-  priceBRL: z.coerce.number().min(0),
+  priceBRL: z.coerce.number().min(0, "Preço inválido"),
   notes: z.string().max(1000).optional().default(""),
-  photoUrl: z.string().max(500).optional().default(""),
+  photoUrl: photoUrlField,
   portfolioCardId: z.string().optional().nullable(),
 });
+
+/** Partial update — no defaults, so omitted fields stay untouched */
+export const listingUpdateSchema = z
+  .object({
+    mode: z.enum(["HAVE", "WANT"]).optional(),
+    name: z.string().min(1).max(120).optional(),
+    set: z.string().min(1).max(120).optional(),
+    condition: z.enum(["NM", "LP", "MP", "HP"]).optional(),
+    priceBRL: z.coerce.number().min(0).optional(),
+    notes: z.string().max(1000).optional(),
+    photoUrl: z
+      .string()
+      .max(1000)
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v.trim())),
+    active: z.boolean().optional(),
+  })
+  .strict();
 
 export const messageSchema = z.object({
   body: z.string().min(1, "Mensagem vazia").max(2000),

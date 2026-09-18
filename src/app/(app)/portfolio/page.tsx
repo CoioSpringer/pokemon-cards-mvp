@@ -18,7 +18,7 @@ export default async function PortfolioPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Meu portfólio</h1>
         <p className="text-sm text-slate-400">
-          Cadastre cartas com foto (upload ou URL), set, condição NM/LP/MP/HP, preço em R$ e notas.
+          Cadastre cartas com busca na Pokédex TCG, foto (upload ou URL), set, condição NM/LP/MP/HP, preço em R$ e notas.
         </p>
       </div>
       <PortfolioForm />
@@ -35,6 +35,7 @@ export default async function PortfolioPage() {
             priceBRL: c.priceBRL,
             notes: c.notes,
             photoUrl: c.photoUrl,
+            tcgId: c.tcgId,
           }))}
         />
       </div>

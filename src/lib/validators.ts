@@ -18,6 +18,13 @@ const photoUrlField = z
   .default("")
   .transform((v) => (v ?? "").trim());
 
+const tcgIdField = z
+  .string()
+  .max(80)
+  .optional()
+  .default("")
+  .transform((v) => (v ?? "").trim());
+
 export const portfolioSchema = z.object({
   name: z.string().min(1, "Nome obrigatório").max(120),
   set: z.string().min(1, "Set obrigatório").max(120),
@@ -25,6 +32,7 @@ export const portfolioSchema = z.object({
   priceBRL: z.coerce.number().min(0, "Preço inválido"),
   notes: z.string().max(1000).optional().default(""),
   photoUrl: photoUrlField,
+  tcgId: tcgIdField,
 });
 
 export const listingSchema = z.object({
@@ -35,6 +43,7 @@ export const listingSchema = z.object({
   priceBRL: z.coerce.number().min(0, "Preço inválido"),
   notes: z.string().max(1000).optional().default(""),
   photoUrl: photoUrlField,
+  tcgId: tcgIdField,
   portfolioCardId: z.string().optional().nullable(),
 });
 
@@ -50,6 +59,11 @@ export const listingUpdateSchema = z
     photoUrl: z
       .string()
       .max(1000)
+      .optional()
+      .transform((v) => (v === undefined ? undefined : v.trim())),
+    tcgId: z
+      .string()
+      .max(80)
       .optional()
       .transform((v) => (v === undefined ? undefined : v.trim())),
     active: z.boolean().optional(),

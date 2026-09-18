@@ -34,6 +34,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: S
           priceBRL: c.priceBRL,
           photoUrl: c.photoUrl,
           notes: c.notes,
+          tcgId: c.tcgId,
         }))}
         defaultPortfolioCardId={fromCard?.id || ""}
         initial={
@@ -46,6 +47,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: S
                 priceBRL: fromCard.priceBRL,
                 notes: fromCard.notes,
                 photoUrl: fromCard.photoUrl,
+                tcgId: fromCard.tcgId,
               }
             : undefined
         }

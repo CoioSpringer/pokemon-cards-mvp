@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUploadField } from "./ImageUploadField";
+import { TcgCardSearch, TcgPick } from "./TcgCardSearch";
 
 type PortfolioOption = {
   id: string;
@@ -12,6 +13,7 @@ type PortfolioOption = {
   priceBRL: number;
   photoUrl: string;
   notes: string;
+  tcgId?: string;
 };
 
 export type ListingFormValues = {
@@ -23,6 +25,7 @@ export type ListingFormValues = {
   priceBRL: number;
   notes: string;
   photoUrl: string;
+  tcgId?: string;
 };
 
 export function ListingForm({
@@ -45,6 +48,7 @@ export function ListingForm({
   const [condition, setCondition] = useState(initial?.condition || "NM");
   const [priceBRL, setPriceBRL] = useState(String(initial?.priceBRL ?? 0));
   const [notes, setNotes] = useState(initial?.notes || "");
+  const [tcgId, setTcgId] = useState(initial?.tcgId || "");
   const editing = Boolean(initial?.id);
 
   function applyPortfolio(id: string) {
@@ -57,6 +61,14 @@ export function ListingForm({
     setPriceBRL(String(card.priceBRL));
     setPhotoUrl(card.photoUrl || "");
     setNotes(card.notes || "");
+    setTcgId(card.tcgId || "");
+  }
+
+  function applyTcg(card: TcgPick) {
+    setName(card.name);
+    setSetValue(card.set);
+    setPhotoUrl(card.photoUrl || "");
+    setTcgId(card.tcgId);
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -72,6 +84,7 @@ export function ListingForm({
       priceBRL: Number(priceBRL || 0),
       notes,
       photoUrl,
+      tcgId,
       ...(editing ? {} : { portfolioCardId: selected || null }),
     };
 
@@ -125,6 +138,20 @@ export function ListingForm({
             ))}
           </select>
         </label>
+      )}
+
+      <TcgCardSearch onSelect={applyTcg} />
+      {tcgId && (
+        <p className="text-xs text-slate-500">
+          Pokédex TCG: <span className="font-mono text-slate-400">{tcgId}</span>
+          <button
+            type="button"
+            className="ml-2 text-sky-400 hover:underline"
+            onClick={() => setTcgId("")}
+          >
+            limpar vínculo
+          </button>
+        </p>
       )}
 
       <input

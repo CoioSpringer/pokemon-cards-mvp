@@ -25,6 +25,7 @@ export async function PUT(req: Request, ctx: Ctx) {
         priceBRL: data.priceBRL,
         notes: data.notes || "",
         photoUrl: data.photoUrl || "",
+        tcgId: data.tcgId || "",
       },
     });
     return NextResponse.json({ card });

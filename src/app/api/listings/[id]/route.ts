@@ -44,6 +44,7 @@ export async function PUT(req: Request, ctx: Ctx) {
       data.priceBRL === undefined &&
       data.notes === undefined &&
       data.photoUrl === undefined &&
+      data.tcgId === undefined &&
       data.active === undefined
     ) {
       return NextResponse.json({ error: "Nada para atualizar" }, { status: 400 });
@@ -59,6 +60,7 @@ export async function PUT(req: Request, ctx: Ctx) {
         ...(data.priceBRL !== undefined ? { priceBRL: data.priceBRL } : {}),
         ...(data.notes !== undefined ? { notes: data.notes } : {}),
         ...(data.photoUrl !== undefined ? { photoUrl: data.photoUrl } : {}),
+        ...(data.tcgId !== undefined ? { tcgId: data.tcgId } : {}),
         ...(data.active !== undefined ? { active: data.active } : {}),
       },
       include: { user: { select: { id: true, name: true } } },

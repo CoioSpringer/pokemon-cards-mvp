@@ -43,6 +43,7 @@ model PortfolioCard {
   priceBRL  Float
   notes     String    @default("")
   photoUrl  String    @default("")
+  tcgId     String    @default("")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -61,6 +62,7 @@ model Listing {
   priceBRL        Float
   notes           String      @default("")
   photoUrl        String      @default("")
+  tcgId           String      @default("")
   active          Boolean     @default(true)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt

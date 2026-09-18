@@ -37,6 +37,7 @@ export default async function EditListingPage({ params }: Ctx) {
           priceBRL: listing.priceBRL,
           notes: listing.notes,
           photoUrl: listing.photoUrl,
+          tcgId: listing.tcgId,
         }}
       />
     </div>

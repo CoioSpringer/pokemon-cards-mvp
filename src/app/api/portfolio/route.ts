@@ -30,6 +30,7 @@ export async function POST(req: Request) {
         priceBRL: data.priceBRL,
         notes: data.notes || "",
         photoUrl: data.photoUrl || "",
+        tcgId: data.tcgId || "",
       },
     });
     return NextResponse.json({ card }, { status: 201 });
